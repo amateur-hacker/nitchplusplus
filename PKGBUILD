@@ -11,25 +11,12 @@ makedepends=('gcc' 'cmake' 'ninja')
 sha256sums=('SKIP') # Skip since using latest commit
 # validpgpkeys=(4FE361904964CAC3E1CE241D57A36E69AE3A6842) # Not sure if tihs is correct GPG implentation, so commenting for now.
 
-prepare() {
-	mkdir -p "$srcdir/build"
-	cd "$srcdir/build"
-	if [ ! -d "$srcdir/build" ]; then
-		echo "ERROR: unable to create build directory."
-		exit 1
-	fi
-}
 build() {
-	cd "$srcdir/build"
-	cmake -GNinja ../nitchplusplus && ninja
+  cmake -B build -S nitchplusplus -GNinja \
+    -DCMAKE_BUILD_TYPE=Release
+  ninja -C build
 }
+
 package() {
-# Install onto system
-	cd "$srcdir/build"
-	ninja
-# Some cleaning up in build dir so it is not cluttered
-# Not necessary
-	cd "$srcdir/.."
-	cp $srcdir/build/nitch++ .
-	rm -r nitchplusplus src
+  install -Dm755 build/nitch++ "$pkgdir/usr/bin/nitch++"
 }
