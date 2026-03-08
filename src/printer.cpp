@@ -9,7 +9,6 @@
 #include <print>
 
 void Printer::Print() {
-    struct Row { bool show; std::string icon; std::string label; std::string value; std::string color; };
     SystemInfo    si;
     Configuration cfg;
     Icons         icon;
@@ -53,20 +52,16 @@ void Printer::Print() {
     if(icon.s_showColors) {
         if(anyPrinted) std::println("  ├{}┤", dashLine);
         std::string label = "colors";
-        std::println("  │ {}  {}{} │ {}", icon.s_iconColors, label, std::string(width - label.size(), ' '), PrintColors());
+        std::println("  │ {}  {}{} │ {}", icon.s_iconColors, label, std::string(width - label.size(), ' '), PrintColors(rows));
     }
     std::println("  ╰{}╯", dashLine);
 }
 
-std::string Printer::PrintColors() {
+std::string Printer::PrintColors(std::array<Printer::Row, 9>& rows) {
     Icons icon;
     std::ostringstream oss;
-    // Use module colors from config or default
-    const std::string defaults[] = { C::NC, C::RED, C::YELLOW, C::G, C::BRIGHT_BLUE, C::BLUE, C::PURPLE };
-    for(int i = 0; i < 7; i++) {
-        const std::string& col = (i > 0 && !Configuration::s_colors[i-1].empty()) ? Configuration::s_colors[i-1] : defaults[i];
-        oss << col << icon.s_iconColorSwatches << ' ';
-    }
+    for(int i = 0; i < 9; i++)
+        if(rows[i].show) oss << rows[i].color << icon.s_iconColorSwatches << ' ';
     oss << C::NC;
     return oss.str();
 }
